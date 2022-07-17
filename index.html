@@ -1,25 +1,32 @@
 <!DOCTYPE html>
 <html>
+<script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>GeoAR.js demo</title>
-    <script src='https://aframe.io/releases/0.9.2/aframe.min.js'></script>
-    <script src="https://raw.githack.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"></script>
-    <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
-    <script>
-        THREEx.ArToolkitContext.baseURL = 'https://raw.githack.com/jeromeetienne/ar.js/master/three.js/'
-    </script>
-</head>
+<body style="margin : 0px; overflow: hidden;">
 
-<body style='margin: 0; overflow: hidden;'>
-    <a-scene vr-mode-ui="enabled: false" embedded
-        arjs='sourceType: webcam; sourceWidth:1280; sourceHeight:960; displayWidth: 1280; displayHeight: 960; debugUIEnabled: false;'>
+    <script src="entities.js"></script>
 
-        <a-entity gltf-model="./assets/free_car_001.gltf" rotation="0 180 0" scale="0.15 0.15 0.15"
-            gps-entity-place="longitude: 40.4521; latitude: 73.5717;" animation-mixer />
-
-        <a-camera gps-camera rotation-reader></a-camera>
+    <a-scene embedded arjs>
+        <a-assets>
+            <a-asset-item id="sensor-obj" src="assets/sensor.obj"></a-asset-item>
+        </a-assets>
+        <a-marker preset="hiro">
+            <a-entity position="0 0.5 0" rotation="-90 0 0" geometry="primitive: plane; width: auto; height: auto"
+                planepadder="padding: 0.2" material="color: #172130;" text="width: 2; value: is this art?;
+                color: #FFF;
+                wrapPixels: 500;
+                align: center;" event-set__enter="_event: mouseenter: material.color = #26364f"
+                event-set__leave="_event: mouseleave; material.color: #172130">
+            </a-entity>
+            <a-obj-model src="#sensor-obj" mtl="" scale="0.001 0.001 0.001" rotation="-90 0 0" position="0 -1 -1">
+            </a-obj-model>
+            <!--<a-box position="0 0.5 0"
+                material="src: #grid; color: yellow; transparent: true; opacity: 0.50;" geometry="">
+                </a-box>-->
+        </a-marker>
+        <a-entity camera></a-entity>
     </a-scene>
 </body>
+
+</html>
