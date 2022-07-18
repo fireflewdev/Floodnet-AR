@@ -10,18 +10,28 @@
     <a-scene embedded arjs>
         <a-assets>
             <a-asset-item id="sensor-obj" src="assets/sensor.obj"></a-asset-item>
+            <a-asset-item id="sensor-anim" src="assets/GLTFfloodnet.gltf"></a-asset-item>
+
         </a-assets>
         <a-marker preset="hiro">
             <a-entity position="0 0.5 0" rotation="-90 0 0" geometry="primitive: plane; width: auto; height: auto"
-                planepadder="padding: 0.2" material="color: #172130;" text="width: 2; value: is this art?;
+                planepadder="padding: 0.2" material="color: #172130;" text="width: 2; value: floodnet!;
                 color: #FFF;
                 wrapPixels: 500;
                 align: center;" event-set__enter="_event: mouseenter: material.color = #26364f"
                 event-set__leave="_event: mouseleave; material.color: #172130">
             </a-entity>
-            <a-obj-model src="#sensor-obj" mtl="" scale="0.001 0.001 0.001" rotation="-90 0 0" position="0 -1 -1">
+
+            <a-entity gltf-model="#sensor-anim" scale="0.002 0.002 0.002" rotation="-90 0 0" position="0 -1 0.5"
+                animation-mixer>
+            </a-entity>
+
+            <!--<a-entity gltf-model="./assets/magnemite/scene.gltf" rotation="0 180 0" scale="0.15 0.15 0.15"
+                position="0 -1 0.5" animation-mixer />-->
+
+            <!--<a-obj-model src="#sensor-obj" mtl="" scale="0.001 0.001 0.001" rotation="-90 0 0" position="0 -1 -1">
             </a-obj-model>
-            <!--<a-box position="0 0.5 0"
+            <a-box position="0 0.5 0"
                 material="src: #grid; color: yellow; transparent: true; opacity: 0.50;" geometry="">
                 </a-box>-->
         </a-marker>
