@@ -22,7 +22,12 @@
                 event-set__leave="_event: mouseleave; material.color: #172130">
             </a-entity>
 
-            <a-torus material="color: #172130;" radius="3" radius-tubular="0.1" position="0 0.5 0"></a-torus>
+
+            <a-ring position="0 0 -1" material="side: double; color: #007DDE; transparent: true; opacity: 0.5"
+                radius-inner="1" radius-outer="2"></a-ring>
+
+            <a-ring position="0 0 -5" material="side: double; color: #DE0000; transparent: true; opacity: 0.5"
+                radius-inner="1" radius-outer="2"></a-ring>
 
         </a-marker>
         <a-entity camera></a-entity>
