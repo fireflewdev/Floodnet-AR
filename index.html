@@ -12,7 +12,7 @@
             <a-asset-item id="sensor-obj" src="assets/sensor.obj"></a-asset-item>
             <a-asset-item id="sensor-anim" src="assets/GLTFfloodnet.gltf"></a-asset-item>
         </a-assets>
-        <a-marker preset="hiro">
+        <a-marker type="pattern" url="./marker/floodnet-pattern.patt">
 
             <a-entity position="0 0.5 0" rotation="-90 0 0" geometry="primitive: plane; width: auto; height: auto"
                 planepadder="padding: 0.2" material="color: #172130;" text="width: 2; value: floodnet!;
@@ -22,12 +22,11 @@
                 event-set__leave="_event: mouseleave; material.color: #172130">
             </a-entity>
 
-            <a-entity gltf-model="#sensor-anim" material="" scale="0.002 0.002 0.002" rotation="-90 0 0"
-                position="0 -1 0.5" animation-mixer>
-            </a-entity>
+            <a-torus material="color: #172130;" radius="3" radius-tubular="0.1" position="0 0.5 0"></a-torus>
+
         </a-marker>
         <a-entity camera></a-entity>
-        <!--<a-marker-camera preset='hiro'></a-marker-camera>-->
+
     </a-scene>
 </body>
 
