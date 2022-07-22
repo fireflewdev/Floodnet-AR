@@ -7,12 +7,93 @@
       const marker = document.querySelector("a-marker");
       console.log("window load code is running");
       const hostEntity = document.querySelector("a-entity");
-      let notPreviouslyFound = true;
+      let previouslyFound = false;
 
       let donuts = document.querySelectorAll("a-torus");
 
-      marker.addEventListener("markerFound", () => {
+      console.log(donuts);
+
+      donuts.forEach((elem, index) => {
+        elem.object3D.visible = false;
+        
+        elem.addEventListener("animationcomplete__pos", () => {
+          elem.object3D.visible = false;
+          // console.log(
+          //   "position animation event for ring " + (index + 1) + " finished"
+          // );
+          // console.log(elem);
+          // console.log("------------------");
+          let lowerRingIndex = index + 3;
+          if (lowerRingIndex < 6) {
+            donuts[lowerRingIndex].emit("ringLaunch");
+            donuts[lowerRingIndex].object3D.visible = true;
+          }
+        });
+
+        elem.addEventListener("animationcomplete__posrev", () => {
+          elem.object3D.visible = false;
+
+          console.log("reverse animation completed")
+
+          let upperRingIndex = index - 3;
+          if (upperRingIndex >= 0) {
+            donuts[upperRingIndex].emit("ringLaunchRev");
+            donuts[upperRingIndex].object3D.visible = true;
+          }
+        })
+      });
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      marker.addEventListener("markerFound", async () => {
         console.log("markerFound event was received");
+
+        if (previouslyFound) {
+          return
+        }
+        
+        sleep(400)
+          .then(() => {
+            donuts[0].emit("ringLaunch");
+            donuts[0].object3D.visible = true;
+            console.log("ring one emitted");
+          })
+          .then(() => sleep(400))
+          .then(() => {
+            donuts[1].emit("ringLaunch");
+            donuts[1].object3D.visible = true;
+            console.log("ring two emitted");
+          })
+          .then(() => sleep(400))
+          .then(() => {
+            donuts[2].emit("ringLaunch");
+            donuts[2].object3D.visible = true;
+            console.log("ring three emitted");
+          });
+
+        donuts[5].addEventListener("animationcomplete__pos", async () => {
+          console.log("starting reverse soundwave");
+
+          sleep(400)
+            .then(() => {
+              donuts[3].emit("ringLaunchRev");
+              donuts[3].object3D.visible = true;
+            })
+            .then(() => sleep(400))
+            .then(() => {
+              donuts[4].emit("ringLaunchRev");
+              donuts[4].object3D.visible = true;
+            })
+            .then(() => sleep(400))
+            .then(() => {
+              donuts[5].emit("ringLaunchRev");
+              donuts[5].object3D.visible = true;
+            });
+        });
+
+        previouslyFound = true;
 
         // let state = 0;
 
@@ -75,10 +156,7 @@
         //   hostEntity.object3D.rotation.set(newObjRot.x, newObjRot.y, newObjRot.z);
         // }, 15);
 
-        // if (notPreviouslyFound) {
-        //   notPreviouslyFound = false;
-        //   hostEntity.object3D.visible = "true";
-        // }
+        
       });
     };
   </script>
@@ -99,7 +177,7 @@
           src="assets/GLTFfloodnet.gltf"
         ></a-asset-item>
       </a-assets>
-      <a-entity visible="false"> </a-entity>
+
       <a-marker type="pattern" emitevents url="./marker/floodnet-pattern.patt">
         <a-entity
           position="0 0.5 0"
@@ -118,24 +196,33 @@
 
         <a-torus
           position="0 0 -6"
-          radius="0.8"
+          radius="0.5"
           radius-tubular="0.08"
-          animation__pos="property: position; to: 0 0 3; dur: 2000; loop: true; easing: linear"
-          animation__rad="property: radius; to: 1.4; dur: 2000; loop: true; easing: linear"
+          material="color: red"
+          animation__pos="property: position; from: 0 0 -6; to: 0 0 3; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__rad="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__posrev="property: position; from: 0 0 3; to: 0 0 -6; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+          animation__radrev="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunchRev"
         ></a-torus>
         <a-torus
-          position="0 0 -3"
-          radius="1"
+          position="0 0 -6"
+          radius="0.5"
           radius-tubular="0.08"
-          animation__pos="property: position; to: 0 0 6; dur: 2000; loop: true; easing: linear"
-          animation__rad="property: radius; to: 1.6; dur: 2000; loop: true; easing: linear"
-        ></a-torus>
-        <a-torus
-          position="0 0 0"
-          radius="1.2"
+          material="color: green"
+          animation__pos="property: position; from: 0 0 -6; to: 0 0 3; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__rad="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__posrev="property: position; from: 0 0 3; to: 0 0 -6; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+          animation__radrev="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+        ></a-torus
+        ><a-torus
+          position="0 0 -6"
+          radius="0.5"
           radius-tubular="0.08"
-          animation__pos="property: position; to: 0 0 9; dur: 2000; loop: true; easing: linear"
-          animation__rad="property: radius; to: 1.8; dur: 2000; loop: true; easing: linear"
+          material="color: blue"
+          animation__pos="property: position; from: 0 0 -6; to: 0 0 3; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__rad="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__posrev="property: position; from: 0 0 3; to: 0 0 -6; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+          animation__radrev="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunchRev"
         ></a-torus>
 
         <!-- <a-ring
@@ -152,12 +239,52 @@
           radius-outer="2"
         ></a-ring> -->
       </a-marker>
-      <!-- <a-marker preset="hiro">
-        <a-torus position="0 0 -1" radius="1.4" radius-tubular="0.08"></a-torus>
-        <a-torus position="0 0 2" radius="1.6" radius-tubular="0.08"></a-torus>
-        <a-torus position="0 0 5" radius="1.8" radius-tubular="0.08"></a-torus>
-        <a-torus position="0 0 8" radius="2" radius-tubular="0.08"></a-torus>
-      </a-marker> -->
+      <a-marker preset="hiro">
+        <a-entity
+          position="0 0.5 0"
+          rotation="-90 0 0"
+          geometry="primitive: plane; width: auto; height: auto"
+          planepadder="padding: 0.2"
+          material="color: #172130;"
+          text="width: 2; value: floodnet! -newer!...;
+                color: #FFF;
+                wrapPixels: 500;
+                align: center;"
+          event-set__enter="_event: mouseenter: material.color = #26364f"
+          event-set__leave="_event: mouseleave; material.color: #172130"
+        >
+        </a-entity>
+        <a-torus
+          position="0 0 -1"
+          radius="1.25"
+          radius-tubular="0.08"
+          material="color: red"
+          animation__pos="property: position; from: 0 0 -1; to: 0 0 8; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__rad="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__posrev="property: position; from: 0 0 8; to: 0 0 -1; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+          animation__radrev="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+        ></a-torus>
+        <a-torus
+          position="0 0 -1"
+          radius="1.25"
+          radius-tubular="0.08"
+          material="color: green"
+          animation__pos="property: position; from: 0 0 -1; to: 0 0 8; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__rad="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__posrev="property: position; from: 0 0 8; to: 0 0 -1; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+          animation__radrev="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+        ></a-torus>
+        <a-torus
+          position="0 0 -1"
+          radius="1.25"
+          radius-tubular="0.08"
+          material="color: blue"
+          animation__pos="property: position; from: 0 0 -1; to: 0 0 8; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__rad="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunch"
+          animation__posrev="property: position; from: 0 0 8; to: 0 0 -1; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+          animation__radrev="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunchRev"
+        ></a-torus>
+      </a-marker>
       <a-entity camera></a-entity>
     </a-scene>
   </body>
