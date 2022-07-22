@@ -1,38 +1,164 @@
 <!DOCTYPE html>
 <html>
-<script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script>
+    window.onload = () => {
+      const marker = document.querySelector("a-marker");
+      console.log("window load code is running");
+      const hostEntity = document.querySelector("a-entity");
+      let notPreviouslyFound = true;
 
-<body style='margin : 0px; overflow: hidden;'>
+      let donuts = document.querySelectorAll("a-torus");
 
+      marker.addEventListener("markerFound", () => {
+        console.log("markerFound event was received");
+
+        // let state = 0;
+
+        // let animate = setInterval(() => {
+
+        //   donuts.forEach((elem, index) => {
+        //     elem.object3D.visible = (index < state)
+        //   })
+
+        //   state = (state + 1) % 5;
+        // }, 300)
+
+        // let newMarkerPosition = marker.object3D.position;
+        // let newMarkerRotation = marker.object3D.rotation;
+
+        // let recents = {
+        //   position: [newMarkerPosition],
+        //   rotation: [newMarkerRotation],
+        // };
+
+        // const avgVectors = (vectors) => {
+        //   let x = 0;
+        //   let y = 0;
+        //   let z = 0;
+        //   const len = vectors.length;
+
+        //   vectors.forEach((v) => {
+        //     x += v.x;
+        //     y += v.y;
+        //     z += v.z;
+        //   });
+
+        //   x = x / len;
+        //   y = y / len;
+        //   z = z / len;
+
+        //   return {
+        //     x: x,
+        //     y: y,
+        //     z: z,
+        //   };
+        // };
+
+        // let smoothUpdate = setInterval(() => {
+        //   newMarkerPosition = marker.object3D.position;
+        //   newMarkerRotation = marker.object3D.rotation;
+
+        //   if (recents.position.length >= 1000) {
+        //     recents.position.shift();
+        //     recents.rotation.shift();
+        //   }
+
+        //   recents.position.push(newMarkerPosition);
+        //   recents.rotation.push(newMarkerRotation);
+
+        //   let newObjPos = avgVectors(recents.position);
+        //   let newObjRot = avgVectors(recents.rotation);
+
+        //   hostEntity.object3D.position.set(newObjPos.x, newObjPos.y, newObjPos.z);
+        //   hostEntity.object3D.rotation.set(newObjRot.x, newObjRot.y, newObjRot.z);
+        // }, 15);
+
+        // if (notPreviouslyFound) {
+        //   notPreviouslyFound = false;
+        //   hostEntity.object3D.visible = "true";
+        // }
+      });
+    };
+  </script>
+
+  <body style="margin: 0px; overflow: hidden">
     <script src="entities.js"></script>
 
-    <a-scene embedded embedded vr-mode-ui="enabled: false" arjs='debugUIEnabled: false;'>
-        <a-assets>
-            <a-asset-item id="sensor-obj" src="assets/sensor.obj"></a-asset-item>
-            <a-asset-item id="sensor-anim" src="assets/GLTFfloodnet.gltf"></a-asset-item>
-        </a-assets>
-        <a-marker type="pattern" url="./marker/floodnet-pattern.patt">
-
-            <a-entity position="0 0.5 0" rotation="-90 0 0" geometry="primitive: plane; width: auto; height: auto"
-                planepadder="padding: 0.2" material="color: #172130;" text="width: 2; value: floodnet! -newer!...;
+    <a-scene
+      embedded
+      embedded
+      vr-mode-ui="enabled: false"
+      arjs="debugUIEnabled: false;"
+    >
+      <a-assets>
+        <a-asset-item id="sensor-obj" src="assets/sensor.obj"></a-asset-item>
+        <a-asset-item
+          id="sensor-anim"
+          src="assets/GLTFfloodnet.gltf"
+        ></a-asset-item>
+      </a-assets>
+      <a-entity visible="false"> </a-entity>
+      <a-marker type="pattern" emitevents url="./marker/floodnet-pattern.patt">
+        <a-entity
+          position="0 0.5 0"
+          rotation="-90 0 0"
+          geometry="primitive: plane; width: auto; height: auto"
+          planepadder="padding: 0.2"
+          material="color: #172130;"
+          text="width: 2; value: floodnet! -newer!...;
                 color: #FFF;
                 wrapPixels: 500;
-                align: center;" event-set__enter="_event: mouseenter: material.color = #26364f"
-                event-set__leave="_event: mouseleave; material.color: #172130">
-            </a-entity>
+                align: center;"
+          event-set__enter="_event: mouseenter: material.color = #26364f"
+          event-set__leave="_event: mouseleave; material.color: #172130"
+        >
+        </a-entity>
 
+        <a-torus
+          position="0 0 -6"
+          radius="0.8"
+          radius-tubular="0.08"
+          animation__pos="property: position; to: 0 0 3; dur: 2000; loop: true; easing: linear"
+          animation__rad="property: radius; to: 1.4; dur: 2000; loop: true; easing: linear"
+        ></a-torus>
+        <a-torus
+          position="0 0 -3"
+          radius="1"
+          radius-tubular="0.08"
+          animation__pos="property: position; to: 0 0 6; dur: 2000; loop: true; easing: linear"
+          animation__rad="property: radius; to: 1.6; dur: 2000; loop: true; easing: linear"
+        ></a-torus>
+        <a-torus
+          position="0 0 0"
+          radius="1.2"
+          radius-tubular="0.08"
+          animation__pos="property: position; to: 0 0 9; dur: 2000; loop: true; easing: linear"
+          animation__rad="property: radius; to: 1.8; dur: 2000; loop: true; easing: linear"
+        ></a-torus>
 
-            <a-ring position="0 0 -1" material="side: double; color: #007DDE; transparent: true; opacity: 0.5"
-                radius-inner="1" radius-outer="2"></a-ring>
+        <!-- <a-ring
+          position="0 0 -1"
+          material="side: double; color: #007DDE; transparent: true; opacity: 0.5"
+          radius-inner="1"
+          radius-outer="2"
+        ></a-ring>
 
-            <a-ring position="0 0 -5" material="side: double; color: #DE0000; transparent: true; opacity: 0.5"
-                radius-inner="1" radius-outer="2"></a-ring>
-
-        </a-marker>
-        <a-entity camera></a-entity>
-
+        <a-ring
+          position="0 0 -5"
+          material="side: double; color: #DE0000; transparent: true; opacity: 0.5"
+          radius-inner="1"
+          radius-outer="2"
+        ></a-ring> -->
+      </a-marker>
+      <!-- <a-marker preset="hiro">
+        <a-torus position="0 0 -1" radius="1.4" radius-tubular="0.08"></a-torus>
+        <a-torus position="0 0 2" radius="1.6" radius-tubular="0.08"></a-torus>
+        <a-torus position="0 0 5" radius="1.8" radius-tubular="0.08"></a-torus>
+        <a-torus position="0 0 8" radius="2" radius-tubular="0.08"></a-torus>
+      </a-marker> -->
+      <a-entity camera></a-entity>
     </a-scene>
-</body>
-
+  </body>
 </html>
