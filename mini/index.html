@@ -129,7 +129,7 @@
   </script>
 
   <body style="margin: 0px; overflow: hidden">
-    <script src="entities.js"></script>
+    <script src="../entities.js"></script>
 
     <a-scene
       embedded
@@ -139,11 +139,7 @@
       <a-assets>
         <a-asset-item
           id="sensorAndMan"
-          src="assets/sensorAndMan.gltf"
-        ></a-asset-item>
-        <a-asset-item
-          id="sensor-anim"
-          src="assets/GLTFfloodnet.gltf"
+          src="../assets/sensorAndMan.gltf"
         ></a-asset-item>
       </a-assets>
 
@@ -154,7 +150,7 @@
         smoothTolerance="0.05"
         smoothThreshold="1"
         emitevents
-        url="./marker/floodnet-pattern.patt"
+        url="../marker/floodnet-pattern.patt"
       >
         <!-- This entity wraps all the rest, so all components can be shifted relative to the marker as desired -->
         <a-entity position="0 0 1">
