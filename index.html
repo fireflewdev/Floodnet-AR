@@ -14,89 +14,89 @@
       // Grab the marker and all our rings so we access them in the script
       const marker = document.querySelector("a-marker");
       const donuts = document.querySelectorAll("a-torus");
+      const floodSign = document.querySelectorAll("a-entity")[3];
+      const floodButton = document.querySelector("button");
+      const water = document.querySelector("a-box");
+
+      console.log(floodSign.object3D)
 
       // Keep track of the first time the upper marker is detected
       // for the purposes of starting animation at that time
       let previouslyFound = false;
+
+      let flooded = false;
+
+      floodButton.addEventListener("click", () => {
+        flooded = !flooded;
+        water.object3D.visible = flooded;
+        floodSign.setAttribute("text", 
+        "width: 2; value: Current Distance: " + (flooded ? 7 : 9) + " feet \n\n Turn the water on and off with the button below.; color: #FFF; wrapPixels: 500; align: center;")
+      });
 
       function sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
 
       async function startSoundBeamDown() {
-        sleep(400)
+        let floodOffset = 0;
+
+        if (flooded) floodOffset = 3;
+
+        sleep(100)
           .then(() => {
-            donuts[0].emit("ringLaunch");
-            donuts[0].object3D.visible = true;
-            console.log("ring one emitted");
+            donuts[0 + floodOffset].emit("ringLaunch");
+            donuts[0 + floodOffset].object3D.visible = true;
           })
-          .then(() => sleep(400))
+          .then(() => sleep(100))
           .then(() => {
-            donuts[1].emit("ringLaunch");
-            donuts[1].object3D.visible = true;
-            console.log("ring two emitted");
+            donuts[1 + floodOffset].emit("ringLaunch");
+            donuts[1 + floodOffset].object3D.visible = true;
           })
-          .then(() => sleep(400))
+          .then(() => sleep(100))
           .then(() => {
-            donuts[2].emit("ringLaunch");
-            donuts[2].object3D.visible = true;
-            console.log("ring three emitted");
+            donuts[2 + floodOffset].emit("ringLaunch");
+            donuts[2 + floodOffset].object3D.visible = true;
           });
       }
 
       async function startSoundBeamUp() {
-        sleep(400)
+        let floodOffset = 0;
+
+        if (flooded) floodOffset = 3;
+
+        sleep(100)
           .then(() => {
-            donuts[3].emit("ringLaunchRev");
-            donuts[3].object3D.visible = true;
+            donuts[0 + floodOffset].emit("ringLaunchRev");
+            donuts[0 + floodOffset].object3D.visible = true;
           })
-          .then(() => sleep(400))
+          .then(() => sleep(100))
           .then(() => {
-            donuts[4].emit("ringLaunchRev");
-            donuts[4].object3D.visible = true;
+            donuts[1 + floodOffset].emit("ringLaunchRev");
+            donuts[1 + floodOffset].object3D.visible = true;
           })
-          .then(() => sleep(400))
+          .then(() => sleep(100))
           .then(() => {
-            donuts[5].emit("ringLaunchRev");
-            donuts[5].object3D.visible = true;
+            donuts[2 + floodOffset].emit("ringLaunchRev");
+            donuts[2 + floodOffset].object3D.visible = true;
           });
       }
 
-      function launchPartnerRingDown(index) {
-        // avoid out of bounds errors since there are only 6 rings
-        if (index < 6) {
-          donuts[index].emit("ringLaunch");
-          donuts[index].object3D.visible = true;
-        }
-      }
-
-      function launchPartnerRingUp(index) {
-        // don't let index go negative
-        if (index >= 0) {
-          donuts[index].emit("ringLaunchRev");
-          donuts[index].object3D.visible = true;
-        }
-      }
-
-      // Each ring will launch the corresponding partner ring when it finishes an animation
+      // Each ring will make itself invisible when it finishes an animation
       donuts.forEach((elem, index) => {
         // All rings should be invisible at the start
         elem.object3D.visible = false;
 
         elem.addEventListener("animationcomplete__pos", () => {
           elem.object3D.visible = false;
-          launchPartnerRingDown(index + 3);
         });
 
         elem.addEventListener("animationcomplete__posrev", () => {
           elem.object3D.visible = false;
-          launchPartnerRingUp(index - 3);
         });
       });
 
       // The whole animation sequence should start for the first time when the upper marker is first detected
       marker.addEventListener("markerFound", async () => {
-        console.log("markerFound event was received");
 
         if (previouslyFound) {
           return;
@@ -107,14 +107,22 @@
         startSoundBeamDown();
       });
 
-      // When the first and last rings finish the up and down animations respectively,
-      // they trigger the opposite animation to make the beam bounce
+      // When the last ring finishes the up and down animations respectively,
+      // it triggers the opposite animation to make the beam bounce
+
+      donuts[2].addEventListener("animationcomplete__pos", () => {
+        startSoundBeamUp();
+      });
+
+      donuts[2].addEventListener("animationcomplete__posrev", () => {
+        startSoundBeamDown();
+      });
 
       donuts[5].addEventListener("animationcomplete__pos", () => {
         startSoundBeamUp();
       });
 
-      donuts[0].addEventListener("animationcomplete__posrev", () => {
+      donuts[5].addEventListener("animationcomplete__posrev", () => {
         startSoundBeamDown();
       });
     };
@@ -125,115 +133,186 @@
 
     <a-scene
       embedded
-      
       vr-mode-ui="enabled: false"
-      arjs="debugUIEnabled: false;"
+      arjs="debugUIEnabled: false; sourceType: webcam; displayWidth: 1280; displayHeight: 960;"
     >
       <a-assets>
-        <a-asset-item id="sensor-obj" src="assets/sensor.obj"></a-asset-item>
+        <a-asset-item
+          id="sensorAndMan"
+          src="assets/sensorAndMan.gltf"
+        ></a-asset-item>
         <a-asset-item
           id="sensor-anim"
           src="assets/GLTFfloodnet.gltf"
         ></a-asset-item>
       </a-assets>
 
-      <a-marker type="pattern" smooth smoothCount="10" smoothTolerance="0.05" smoothThreshold="1" emitevents url="./marker/floodnet-pattern.patt">
-        <a-entity
-          position="-2 0.5 -1"
-          rotation="-90 0 0"
-          text="width: 2; value: The sensor sends an ultrasonic pulse out at 40kHz which travels through the air and if there is an obstacle or object, it will bounce back to the sensor.  By calculating the travel time and the speed of sound, the distance can be calculated.;
+      <a-marker
+        type="pattern"
+        smooth
+        smoothCount="10"
+        smoothTolerance="0.05"
+        smoothThreshold="1"
+        emitevents
+        url="./marker/floodnet-pattern.patt"
+      >
+        <!-- This entity wraps all the rest, so all components can be shifted relative to the marker as desired -->
+        <a-entity position="0 0 1">
+          <!-- These components make signs -->
+
+          <a-entity
+            position="-1.5 -0.5 -1.5"
+            rotation="-90 0 0"
+            text="width: 2; value: The sensor sends an ultrasonic pulse out at 40kHz which travels through the air and if there is an obstacle or object, it will bounce back to the sensor.  By calculating the travel time and the speed of sound, the distance can be calculated.;
                 color: #FFF;
                 wrapPixels: 500;
                 align: center;"
-        >
-        </a-entity>
-        <a-entity
-          position="-2 0.45 -1"
-          rotation="-90 0 0"
-          geometry="primitive: plane; width: 2; height: 2"
-          material="side: double; color: #172130; transparent: true; opacity: 0.5"
-        >
+          >
+          </a-entity>
+          <a-entity
+            position="-1.5 -0.58 -1.5"
+            rotation="-90 0 0"
+            geometry="primitive: plane; width: 2.5; height: 2.5"
+            material="side: double; color: #172130; transparent: true; opacity: 0.5"
+          >
+          </a-entity>
 
-        </a-entity>
-
-        <a-torus
-          position="0 0 -6"
-          radius="0.5"
-          radius-tubular="0.08"
-          material="color: white; transparent: true; opacity: 0.8"
-          animation__pos="property: position; from: 0 0 -6; to: 0 0 3; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__rad="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__posrev="property: position; from: 0 0 3; to: 0 0 -6; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-          animation__radrev="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-        ></a-torus>
-        <a-torus
-          position="0 0 -6"
-          radius="0.5"
-          radius-tubular="0.08"
-          material="color: white; transparent: true; opacity: 0.8"
-          animation__pos="property: position; from: 0 0 -6; to: 0 0 3; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__rad="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__posrev="property: position; from: 0 0 3; to: 0 0 -6; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-          animation__radrev="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-        ></a-torus
-        ><a-torus
-          position="0 0 -6"
-          radius="0.5"
-          radius-tubular="0.08"
-          material="color: white; transparent: true; opacity: 0.8"
-          animation__pos="property: position; from: 0 0 -6; to: 0 0 3; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__rad="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__posrev="property: position; from: 0 0 3; to: 0 0 -6; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-          animation__radrev="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-        ></a-torus>
-
-      </a-marker>
-      <a-marker preset="hiro">
-        <a-entity
-          position="0 0.5 0"
-          rotation="-90 0 0"
-          geometry="primitive: plane; width: auto; height: auto"
-          planepadder="padding: 0.2"
-          material="color: #172130;"
-          text="width: 2; value: floodnet! -newer!...;
+          <a-entity
+            position="1.5 -0.5 -1.5"
+            rotation="-90 0 0"
+            text="width: 2; value: Current Distance: 8 feet \n\n Turn the water on and off with the button below.;
                 color: #FFF;
                 wrapPixels: 500;
                 align: center;"
-        >
+          >
+          </a-entity>
+          <a-entity
+            position="1.5 -0.58 -1.5"
+            rotation="-90 0 0"
+            geometry="primitive: plane; width: 2.5; height: 2"
+            material="side: double; color: #172130; transparent: true; opacity: 0.5"
+          >
+          </a-entity>
+
+          <!-- These three rings form the long animation -->
+
+          <a-torus
+            position="0 0 -1.35"
+            radius="0.05"
+            radius-tubular="0.005"
+            material="color: lightblue; transparent: true; opacity: 0.8"
+            animation__pos="property: position; from: 0 0 -1.35; to: 0 0 0.2; dur: 1500; easing: linear; startEvents: ringLaunch"
+            animation__rad="property: radius; from: 0.05; to: 0.1; dur: 1500; easing: linear; startEvents: ringLaunch"
+            animation__posrev="property: position; from: 0 0 0.2; to: 0 0 -1.35; dur: 1500; easing: linear; startEvents: ringLaunchRev"
+            animation__radrev="property: radius; from: 0.05; to: 0.1; dur: 1500; easing: linear; startEvents: ringLaunchRev"
+          ></a-torus>
+          <a-torus
+            position="0 0 -1.35"
+            radius="0.05"
+            radius-tubular="0.005"
+            material="color: lightblue; transparent: true; opacity: 0.8"
+            animation__pos="property: position; from: 0 0 -1.35; to: 0 0 0.2; dur: 1500; easing: linear; startEvents: ringLaunch"
+            animation__rad="property: radius; from: 0.05; to: 0.1; dur: 1500; easing: linear; startEvents: ringLaunch"
+            animation__posrev="property: position; from: 0 0 0.2; to: 0 0 -1.35; dur: 1500; easing: linear; startEvents: ringLaunchRev"
+            animation__radrev="property: radius; from: 0.05; to: 0.1; dur: 1500; easing: linear; startEvents: ringLaunchRev"
+          ></a-torus>
+          <a-torus
+            position="0 0 -1.35"
+            radius="0.05"
+            radius-tubular="0.005"
+            material="color: lightblue; transparent: true; opacity: 0.8"
+            animation__pos="property: position; from: 0 0 -1.35; to: 0 0 0.2; dur: 1500; easing: linear; startEvents: ringLaunch"
+            animation__rad="property: radius; from: 0.05; to: 0.1; dur: 1500; easing: linear; startEvents: ringLaunch"
+            animation__posrev="property: position; from: 0 0 0.2; to: 0 0 -1.35; dur: 1500; easing: linear; startEvents: ringLaunchRev"
+            animation__radrev="property: radius; from: 0.05; to: 0.1; dur: 1500; easing: linear; startEvents: ringLaunchRev"
+          ></a-torus>
+
+          <!-- These three rings form the short animation -->
+
+          <a-torus
+            position="0 0 -1.35"
+            radius="0.05"
+            radius-tubular="0.005"
+            material="color: lightblue; transparent: true; opacity: 0.8"
+            animation__pos="property: position; from: 0 0 -1.35; to: 0 0 -0.11; dur: 1200; easing: linear; startEvents: ringLaunch"
+            animation__rad="property: radius; from: 0.05; to: 0.1; dur: 1200; easing: linear; startEvents: ringLaunch"
+            animation__posrev="property: position; from: 0 0 -0.11; to: 0 0 -1.35; dur: 1200; easing: linear; startEvents: ringLaunchRev"
+            animation__radrev="property: radius; from: 0.05; to: 0.1; dur: 1200; easing: linear; startEvents: ringLaunchRev"
+          ></a-torus>
+          <a-torus
+            position="0 0 -1.35"
+            radius="0.05"
+            radius-tubular="0.005"
+            material="color: lightblue; transparent: true; opacity: 0.8"
+            animation__pos="property: position; from: 0 0 -1.35; to: 0 0 -0.11; dur: 1200; easing: linear; startEvents: ringLaunch"
+            animation__rad="property: radius; from: 0.05; to: 0.1; dur: 1200; easing: linear; startEvents: ringLaunch"
+            animation__posrev="property: position; from: 0 0 -0.11; to: 0 0 -1.35; dur: 1200; easing: linear; startEvents: ringLaunchRev"
+            animation__radrev="property: radius; from: 0.05; to: 0.1; dur: 1200; easing: linear; startEvents: ringLaunchRev"
+          ></a-torus>
+          <a-torus
+            position="0 0 -1.35"
+            radius="0.05"
+            radius-tubular="0.005"
+            material="color: lightblue; transparent: true; opacity: 0.8"
+            animation__pos="property: position; from: 0 0 -1.35; to: 0 0 -0.11; dur: 1200; easing: linear; startEvents: ringLaunch"
+            animation__rad="property: radius; from: 0.05; to: 0.1; dur: 1200; easing: linear; startEvents: ringLaunch"
+            animation__posrev="property: position; from: 0 0 -0.11; to: 0 0 -1.35; dur: 1200; easing: linear; startEvents: ringLaunchRev"
+            animation__radrev="property: radius; from: 0.05; to: 0.1; dur: 1200; easing: linear; startEvents: ringLaunchRev"
+          ></a-torus>
+
+          <!-- This is the sensor model, and a road, which are static -->
+
+          <a-gltf-model
+            src="#sensorAndMan"
+            scale="0.1 0.1 0.1"
+            rotation="0 -90 90"
+            position="-0.01 0 0.2"
+          ></a-gltf-model>
+
+          <a-plane
+            position="0 0 0.21"
+            rotation="0 0 0"
+            material="side: double; color: gray"
+            height="1"
+            width="2"
+          ></a-plane>
+
+          <a-box
+            height="1"
+            position="0 0 0.06"
+            width="2"
+            depth="0.3"
+            material="color: blue; transparent: true; opacity: 0.6"
+          ></a-box>
         </a-entity>
-        <a-torus
-          position="0 0 -1"
-          radius="1.25"
-          radius-tubular="0.08"
-          material="color: white; transparent: true; opacity: 0.8"
-          animation__pos="property: position; from: 0 0 -1; to: 0 0 8; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__rad="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__posrev="property: position; from: 0 0 8; to: 0 0 -1; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-          animation__radrev="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-        ></a-torus>
-        <a-torus
-          position="0 0 -1"
-          radius="1.25"
-          radius-tubular="0.08"
-          material="color: white; transparent: true; opacity: 0.8"
-          animation__pos="property: position; from: 0 0 -1; to: 0 0 8; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__rad="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__posrev="property: position; from: 0 0 8; to: 0 0 -1; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-          animation__radrev="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-        ></a-torus>
-        <a-torus
-          position="0 0 -1"
-          radius="1.25"
-          radius-tubular="0.08"
-          material="color: white; transparent: true; opacity: 0.8"
-          animation__pos="property: position; from: 0 0 -1; to: 0 0 8; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__rad="property: radius; from: 1.25; to: 2; dur: 2000; easing: linear; startEvents: ringLaunch"
-          animation__posrev="property: position; from: 0 0 8; to: 0 0 -1; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-          animation__radrev="property: radius; from: 0.5; to: 1.25; dur: 2000; easing: linear; startEvents: ringLaunchRev"
-        ></a-torus>
-        <a-plane position="0 4 8" visible="true" material="side: double; color: #0000FF; transparent: true; opacity: 0.5" width="20" height="20" rotation="0 0 0"></a-plane>
       </a-marker>
-      <a-entity camera></a-entity>
+      <a-entity camera> </a-entity>
     </a-scene>
+    <div
+      style="
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        width: 100%;
+        text-align: center;
+        z-index: 1;
+      "
+    >
+      <button
+        style="
+          border: '0';
+          bottom: '0';
+          cursor: 'pointer';
+          width: '80%';
+          height: '10%';
+          padding: '5%';
+          position: 'absolute';
+          right: '0';
+          z-Index: '9999';
+        "
+      >
+        Toggle floodwaters
+      </button>
+    </div>
   </body>
 </html>
